@@ -1,0 +1,40 @@
+{
+  "name": "@tl/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./src/app.ts",
+  "exports": {
+    ".": {
+      "types": "./src/app.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsup",
+    "start": "NODE_ENV=production node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx src/db/migrate.ts",
+    "db:push": "drizzle-kit push",
+    "db:seed": "tsx src/db/seed.ts",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.8",
+    "@tl/shared": "*",
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.38.3",
+    "hono": "^4.6.16",
+    "postgres": "^3.4.5",
+    "zod": "^4.0.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "drizzle-kit": "^0.30.1",
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2"
+  }
+}

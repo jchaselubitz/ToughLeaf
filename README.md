@@ -38,7 +38,7 @@ What stands out:
 | A lot of information recorded (trade, scope, contract value, tier, certification, issuing body, expiration date, etc.) seem likely to be present somewhere programmatically reachable, either by some kind of direct data transfer from the client, or via a form or chatbot interface. | Who has each piece of information, and at which step in the process? |
 | Status updates and tracking down information both appear to be key parts of the process. | How much manual work currently goes into keeping track of what information is missing? Where would be the best place, and what would be the best time, to surface that information automatically? |
 
-Note: I am realizing that this ChatGPT simulation exercise is a great way to get my bearings before shadowing the client. In the future, I will probably spend a few days on this first. 
+**Note:** I am realizing that this ChatGPT simulation exercise is a great way to get my bearings before shadowing the client. In the future, I will probably spend a few days on this first. 
 
 ### Data Collection
 Based on the observations from the simulation, I expect to need to collect the following data:

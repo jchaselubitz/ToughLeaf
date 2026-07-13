@@ -1,0 +1,29 @@
+# Local development Postgres for the Tough Leaf compliance app.
+# Matches the default DATABASE_URL in .env.example
+# (postgres://tl:tl@localhost:5432/tl). Railway provides Postgres in prod.
+#
+#   yarn db:up        # start Postgres in the background
+#   yarn db:migrate   # apply migrations
+#   yarn db:seed      # load document types + seeded requirements
+#   yarn db:down      # stop and remove the container (keeps the volume)
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: tl-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: tl
+      POSTGRES_PASSWORD: tl
+      POSTGRES_DB: tl
+    ports:
+      - '5432:5432'
+    volumes:
+      - tl-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U tl -d tl']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  tl-postgres-data:

@@ -1,0 +1,31 @@
+{
+  "name": "tl-challenge",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "packageManager": "yarn@1.22.22",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c blue,magenta \"yarn workspace @tl/api dev\" \"yarn workspace @tl/web dev\"",
+    "build": "yarn workspace @tl/web build && yarn workspace @tl/api build",
+    "start": "yarn workspace @tl/api start",
+    "typecheck": "yarn workspaces run typecheck",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:generate": "yarn workspace @tl/api db:generate",
+    "db:migrate": "yarn workspace @tl/api db:migrate",
+    "db:seed": "yarn workspace @tl/api db:seed",
+    "db:studio": "yarn workspace @tl/api db:studio",
+    "db:setup": "yarn db:migrate && yarn db:seed"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20.11"
+  }
+}
