@@ -29,16 +29,19 @@ Prompt:
 **You can view the response here: [two-week-officer-shadow.md](https://github.com/jchaselubitz/ToughLeaf/blob/main/Simulations/two-week-officer-shadow.md)**
 
 What stands out:
-* I need to become more familiar with the domain vocabulary. For example, "exceptions" and "findings" are self-explanatory, but unexpected.
-* A lot of the relevant data is highly structured. * **Questions:** How can I get access to it programmatically? Which data is sensitive and needs to be handled securely?
-* Much of the communication work seems repetitive and likely unpleasant. **Questions:** what are the common questions that subcontractors ask? What information is required to provide the answers?
-* A lot of information recorded (trade, scope, contract value, tier, certification, issuing body, expiration date, etc.) seem likely to be present somewhere programmatically reachable, either by some kind of direct data transfer from the client,or via a form or chatbot interface. **Questions:** Who has each piece of information, and at which step in the process?
-* Status updates and tracking down information both appear to be key parts of the process. **Questions:** How much manual work currently goes into keeping track of what information is missing? Where would be the best place, and what would be the best time, to surface that information automatically? 
+
+| Observation | Questions |
+| --- | --- |
+| I need to become more familiar with the domain vocabulary. For example, "exceptions" and "findings" are self-explanatory, but unexpected. | |
+| A lot of the relevant data is highly structured. | How can I get access to it programmatically? Which data is sensitive and needs to be handled securely? |
+| Much of the communication work seems repetitive and likely unpleasant. | What are the common questions that subcontractors ask? What information is required to provide the answers? |
+| A lot of information recorded (trade, scope, contract value, tier, certification, issuing body, expiration date, etc.) seem likely to be present somewhere programmatically reachable, either by some kind of direct data transfer from the client, or via a form or chatbot interface. | Who has each piece of information, and at which step in the process? |
+| Status updates and tracking down information both appear to be key parts of the process. | How much manual work currently goes into keeping track of what information is missing? Where would be the best place, and what would be the best time, to surface that information automatically? |
 
 Note: I am realizing that this ChatGPT simulation exercise is a great way to get my bearings before shadowing the client. In the future, I will probably spend a few days on this first. 
 
 ### Data Collection
-based on the observations from the simulation, I expect to need to collect the following data:
+Based on the observations from the simulation, I expect to need to collect the following data:
 * A full list of datapoints compliance officers collect on subcontractors.
 * A list of external sources of data that compliance officers use to verify the accuracy of the information they collect.
 * An inventory of the data currently being tracked by the client, and where it is stored.
