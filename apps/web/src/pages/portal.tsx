@@ -123,9 +123,14 @@ function UploadZone({ token, request }: { token: string; request: DocumentReques
         <p className="text-center text-xs text-muted-foreground sm:text-right">Drop a PDF or image anywhere on this card<br />Maximum size: 10 MB</p>
       </div>
     </div>
-    {request.incompleteReason && <div className="mx-5 mb-5 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800 sm:mx-6">
+    {status === 'incomplete' && (request.incompleteReason || request.failingRequirements?.length) && <div className="mx-5 mb-5 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800 sm:mx-6">
       <p className="font-medium">Action needed</p>
-      <p className="mt-1">{request.incompleteReason}</p>
+      {request.incompleteReason && <p className="mt-1">{request.incompleteReason}</p>}
+      {request.failingRequirements && request.failingRequirements.length > 0 && <ul className="mt-2 list-disc space-y-1 pl-5">
+        {request.failingRequirements.map((item, index) => <li key={index}>
+          <span className="font-medium">{item.requirement}</span>{item.reason ? ` — ${item.reason}` : ''}
+        </li>)}
+      </ul>}
     </div>}
     <div className="border-t bg-muted/30 px-5 py-4 sm:px-6">
       <ProgressIndicator request={request} />

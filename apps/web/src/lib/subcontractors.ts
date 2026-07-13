@@ -14,8 +14,10 @@ export interface DocumentRequestView {
     requirements: Array<{ id: string; text: string; seeded: boolean }>;
   };
   versions: DocumentVersionView[];
-  /** Present only in the subcontractor portal response. */
+  /** Present only in the subcontractor portal response, when the request is incomplete. */
   incompleteReason?: string;
+  /** Present only in the subcontractor portal response: each failed requirement and its message. */
+  failingRequirements?: Array<{ requirement: string; reason: string }>;
 }
 
 export interface DocumentVersionView {
@@ -47,7 +49,7 @@ export interface SubcontractorView {
 
 export interface EmailLogView {
   id: string;
-  kind: 'request' | 'follow_up';
+  kind: 'request' | 'follow_up' | 'incomplete';
   toEmail: string;
   subject: string;
   resendId: string | null;
@@ -115,7 +117,7 @@ export const subcontractorApi = {
     subcontractorId: string,
     requestId: string,
     input: { status: 'accepted' | 'incomplete'; humanReview: ReviewResult },
-  ) => request<{ version: DocumentVersionView }>(
+  ) => request<{ version: DocumentVersionView; email?: SentEmailView; emailError?: string }>(
     `/api/subcontractors/${subcontractorId}/requests/${requestId}/review`,
     { method: 'PATCH', body: JSON.stringify(input) },
   ),

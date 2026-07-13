@@ -64,6 +64,34 @@ export async function sendDocumentEmail(subcontractor: EmailSubcontractor, kind:
   if (requests.length === 0) throw new Error('There are no outstanding document requests to include in a follow-up.');
 
   const message = renderEmail({ kind, subcontractor, requests });
+  return deliverEmail(subcontractor, kind, message);
+}
+
+/** A single failing requirement plus the (Gemini-drafted, human-confirmed) message shown to the sub. */
+export type FailingRequirement = { requirement: string; reason: string };
+
+function renderIncompleteEmail({ subcontractor, documentTypeName, failing, message }: {
+  subcontractor: EmailSubcontractor;
+  documentTypeName: string;
+  failing: FailingRequirement[];
+  message?: string;
+}) {
+  const link = portalUrl(subcontractor.portalToken);
+  const subject = `Action required: ${documentTypeName} needs corrections`;
+  const lead = `We reviewed your ${documentTypeName} and it cannot be accepted yet. Please address the following before re-submitting through your portal.`;
+  const items = failing
+    .map((item) => `<li><strong>${escapeHtml(item.requirement)}</strong>${item.reason ? ` — ${escapeHtml(item.reason)}` : ''}</li>`)
+    .join('');
+  const overall = message?.trim()
+    ? `<p>${escapeHtml(message.trim())}</p>`
+    : '';
+  const html = `<!doctype html><html><body style="font-family:Arial,sans-serif;line-height:1.5;color:#172033"><p>Hello ${escapeHtml(subcontractor.name)},</p><p>${lead}</p>${items ? `<ul>${items}</ul>` : ''}${overall}<p><a href="${escapeHtml(link)}">Open your document portal</a></p><p>Thank you,<br>Tough Leaf Compliance</p></body></html>`;
+  const textItems = failing.map((item) => `- ${item.requirement}${item.reason ? `: ${item.reason}` : ''}`).join('\n');
+  const text = `Hello ${subcontractor.name},\n\n${lead}\n\n${textItems}${message?.trim() ? `\n\n${message.trim()}` : ''}\n\nOpen your document portal: ${link}\n\nThank you,\nTough Leaf Compliance`;
+  return { subject, html, text };
+}
+
+async function deliverEmail(subcontractor: EmailSubcontractor, kind: EmailKind, message: { subject: string; html: string; text: string }): Promise<EmailLogEntry> {
   const apiKey = process.env.RESEND_API_KEY?.trim();
   let resendId: string | null = null;
   if (apiKey) {
@@ -88,6 +116,18 @@ export async function sendDocumentEmail(subcontractor: EmailSubcontractor, kind:
     previewHtml: message.html,
   }).returning();
   return entry;
+}
+
+/**
+ * Notify the subcontractor that a document was marked incomplete, listing each
+ * failing requirement with its message and a link back to their portal page.
+ */
+export async function sendIncompleteEmail(
+  subcontractor: EmailSubcontractor,
+  input: { documentTypeName: string; failing: FailingRequirement[]; message?: string },
+): Promise<EmailLogEntry> {
+  const message = renderIncompleteEmail({ subcontractor, documentTypeName: input.documentTypeName, failing: input.failing, message: input.message });
+  return deliverEmail(subcontractor, 'incomplete', message);
 }
 
 export function isPreviewEmail(entry: EmailLogEntry) {

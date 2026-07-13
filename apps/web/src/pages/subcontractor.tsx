@@ -199,7 +199,17 @@ export function SubcontractorPage() {
   const review = useMutation({
     mutationFn: (input: { requestId: string; status: 'accepted' | 'incomplete'; humanReview: ReviewResult }) =>
       subcontractorApi.review(id, input.requestId, { status: input.status, humanReview: input.humanReview }),
-    onSuccess: () => { refresh(); toast({ message: 'Document decision saved.' }); },
+    onSuccess: (result) => {
+      setPreview(result.email?.preview ? result.email.log : undefined);
+      refresh();
+      if (result.emailError) {
+        toast({ message: `Decision saved, but the email failed: ${result.emailError}`, tone: 'error' });
+      } else if (result.email) {
+        toast({ message: result.email.preview ? 'Incomplete notice saved in preview mode.' : 'Incomplete notice emailed to the subcontractor.' });
+      } else {
+        toast({ message: 'Document decision saved.' });
+      }
+    },
     onError: (error) => toast({ message: error instanceof Error ? error.message : 'Unable to save the review.', tone: 'error' }),
   });
   const rerunAiReview = useMutation({
@@ -316,7 +326,7 @@ export function SubcontractorPage() {
         </div>
       </Disclosure>
       <Disclosure title="Email history" meta={`${sub.emailLog.length} sent`}>
-        {sub.emailLog.length === 0 ? <p className="text-sm text-muted-foreground">No document request emails have been sent.</p> : <ul className="divide-y">{sub.emailLog.map((email) => <li className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm first:pt-0 last:pb-0" key={email.id}><div><p className="font-medium">{email.kind === 'request' ? 'Initial request' : 'Follow-up'} · {email.subject}</p><p className="text-muted-foreground">To {email.toEmail} · {new Date(email.sentAt).toLocaleString()} · {email.resendId ? 'Delivered through Resend' : 'Preview only'}</p></div>{!email.resendId && <Button size="sm" variant="outline" onClick={() => setPreview(email)}>View preview</Button>}</li>)}</ul>}
+        {sub.emailLog.length === 0 ? <p className="text-sm text-muted-foreground">No document request emails have been sent.</p> : <ul className="divide-y">{sub.emailLog.map((email) => <li className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm first:pt-0 last:pb-0" key={email.id}><div><p className="font-medium">{email.kind === 'request' ? 'Initial request' : email.kind === 'incomplete' ? 'Incomplete notice' : 'Follow-up'} · {email.subject}</p><p className="text-muted-foreground">To {email.toEmail} · {new Date(email.sentAt).toLocaleString()} · {email.resendId ? 'Delivered through Resend' : 'Preview only'}</p></div>{!email.resendId && <Button size="sm" variant="outline" onClick={() => setPreview(email)}>View preview</Button>}</li>)}</ul>}
       </Disclosure>
     </div>
     </div>

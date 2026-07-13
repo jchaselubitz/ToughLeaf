@@ -15,6 +15,6 @@ export type DecidedStatus = (typeof DECIDED_STATUSES)[number];
 export const decidedStatusSchema = z.enum(DECIDED_STATUSES);
 
 /** Kinds of email tracked in email_log (doubles as the good-faith-efforts trail). */
-export const EMAIL_KINDS = ['request', 'follow_up'] as const;
+export const EMAIL_KINDS = ['request', 'follow_up', 'incomplete'] as const;
 export type EmailKind = (typeof EMAIL_KINDS)[number];
 export const emailKindSchema = z.enum(EMAIL_KINDS);

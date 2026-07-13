@@ -14,7 +14,7 @@ import {
 } from '@tl/shared';
 import { db, documentRequests, documentVersions, requirements, settings, subcontractors } from './db';
 import { queueAiReview } from './ai-review';
-import { isPreviewEmail, sendDocumentEmail } from './email';
+import { isPreviewEmail, sendDocumentEmail, sendIncompleteEmail } from './email';
 import { getDocumentDownloadUrl, storeDocument } from './storage';
 
 const app = new Hono();
@@ -106,6 +106,14 @@ function incompleteReason(version?: { humanReview: ReviewResult | null }) {
     || version.humanReview.summary?.trim();
 }
 
+/** Each failed requirement paired with its Gemini-drafted, human-confirmed message. */
+function failingRequirements(version?: { humanReview: ReviewResult | null }) {
+  if (!version?.humanReview) return [];
+  return version.humanReview.results
+    .filter((result) => !result.pass)
+    .map((result) => ({ requirement: result.requirement, reason: result.reason?.trim() || '' }));
+}
+
 /** The public portal only receives the derived decision message, never internal review details. */
 function serializePortalSubcontractor<T extends {
   documentRequests: Array<{
@@ -129,6 +137,7 @@ function serializePortalSubcontractor<T extends {
       return {
         ...request,
         incompleteReason: request.status === 'incomplete' ? incompleteReason(current) : undefined,
+        failingRequirements: request.status === 'incomplete' ? failingRequirements(current) : undefined,
         versions: [...versions]
           .sort((a, b) => b.uploadedAt.getTime() - a.uploadedAt.getTime())
           .map(({ storagePath: _storagePath, humanReview: _humanReview, aiReview: _aiReview, aiReviewedAt: _aiReviewedAt, extracted: _extracted, decidedAt: _decidedAt, decidedStatus: _decidedStatus, ...version }) => version),
@@ -432,6 +441,7 @@ app.patch('/api/subcontractors/:subcontractorId/requests/:requestId/review', asy
 
   const request = await db.query.documentRequests.findFirst({
     where: eq(documentRequests.id, c.req.param('requestId')),
+    with: { documentType: true, subcontractor: true },
   });
   if (!request || request.subcontractorId !== c.req.param('subcontractorId')) {
     return c.json({ error: 'Document request not found' }, 404);
@@ -461,7 +471,27 @@ app.patch('/api/subcontractors/:subcontractorId/requests/:requestId/review', asy
     return updated;
   });
 
-  return c.json({ version: { ...updatedVersion, storagePath: undefined } });
+  // Notify the sub of the failing requirements and link them back to their portal.
+  let email;
+  let emailError: string | undefined;
+  if (parsed.data.status === 'incomplete') {
+    const failing = parsed.data.humanReview.results
+      .filter((result) => !result.pass)
+      .map((result) => ({ requirement: result.requirement, reason: result.reason?.trim() || '' }));
+    try {
+      const log = await sendIncompleteEmail(request.subcontractor, {
+        documentTypeName: request.documentType.name,
+        failing,
+        message: parsed.data.humanReview.reason,
+      });
+      email = { log, preview: isPreviewEmail(log) };
+    } catch (error) {
+      console.error('Incomplete notification email failed', error);
+      emailError = error instanceof Error ? error.message : 'Unable to send the incomplete-document email.';
+    }
+  }
+
+  return c.json({ version: { ...updatedVersion, storagePath: undefined }, email, emailError });
 });
 
 export type AppType = typeof app;
