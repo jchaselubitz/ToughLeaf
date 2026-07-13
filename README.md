@@ -24,7 +24,7 @@ For the purposes of this exercise. I used ChatGPT to first research the relevant
 
 Prompt: 
 
-> I am developing software for this: [https://www.toughleaf.com/products/clearcomply](https://www.toughleaf.com/products/clearcomply). Lets imagine I spend two weeks shadowing a compliance officer who is responsible. Review [legal-and-regulatory-framework.md](/Users/jake/Development/Cooperativ/Tough Leaf/tl-challenge/Documentation/legal-and-regulatory-framework.md) then imagine yourself as being a senior compliance professional (you can do internet research to learn more about this). I shadow you for two weeks. What do I see?
+> I am developing software for this: https://www.toughleaf.com/products/clearcomply. Lets imagine I spend two weeks shadowing a compliance officer who is responsible. Review [legal-and-regulatory-framework.md](https://github.com/jchaselubitz/ToughLeaf/blob/main/Documentation/legal-and-regulatory-framework.md) then imagine yourself as being a senior compliance professional (you can do internet research to learn more about this). I shadow you for two weeks. What do I see?
 
 You can view the response here: [two-week-officer-shadow.md](/Users/jake/Development/Cooperativ/Tough Leaf/tl-challenge/Simulations/two-week-officer-shadow.md)
 
