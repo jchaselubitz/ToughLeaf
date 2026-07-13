@@ -26,7 +26,7 @@ Prompt:
 
 > I am developing software for this: https://www.toughleaf.com/products/clearcomply. Lets imagine I spend two weeks shadowing a compliance officer who is responsible. Review [legal-and-regulatory-framework.md](https://github.com/jchaselubitz/ToughLeaf/blob/main/Documentation/legal-and-regulatory-framework.md) then imagine yourself as being a senior compliance professional (you can do internet research to learn more about this). I shadow you for two weeks. What do I see?
 
-You can view the response here: [two-week-officer-shadow.md](/Users/jake/Development/Cooperativ/Tough Leaf/tl-challenge/Simulations/two-week-officer-shadow.md)
+**You can view the response here: [two-week-officer-shadow.md](https://github.com/jchaselubitz/ToughLeaf/blob/main/Simulations/two-week-officer-shadow.md)**
 
 What stands out:
 * I need to become more familiar with the domain vocabulary. For example, "exceptions" and "findings" are self-explanatory, but unexpected.
