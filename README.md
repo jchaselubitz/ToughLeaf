@@ -10,13 +10,6 @@
   - [Risks](#risks)
 - [Section 2 — Prioritization Exercise](#section-2---prioritization-exercise)
 - [Sections 3 & 4 — Workflow Design Challenge](#sections-3--4---workflow-design-challenge)
-  - [What happens when a subcontractor is added?](#1-what-happens-when-a-subcontractor-is-added-to-a-project)
-  - [What notifications should be sent?](#2-what-notifications-should-be-sent)
-  - [What should happen when required documents are missing?](#3-what-should-happen-when-required-documents-are-missing)
-  - [Where would you use AI?](#4-where-would-you-use-ai)
-  - [Where would you avoid using AI?](#5-where-would-you-avoid-using-ai)
-  - [What would the MVP include?](#6-what-would-the-mvp-include)
-  - [What would come after the MVP?](#7-what-would-come-after-the-mvp)
   - **[Demo Webapp** *(live site)](#demo-webapp)*
 - [Stack](#stack)
   - [Tools used](#tools-used)
@@ -25,15 +18,11 @@
 
 ---
 
-
-
 # Section 1 - Understanding the Problem
-
-
 
 ### Initial Questions
 
-10 is too many high-level questions, and also too few specific questions. When approaching a new domain, I start with question areas:
+10 is too many high-level questions, and 10 specific, detailed questions are too few. When approaching a new domain, I start with question areas:
 
 1. What are the regular, process-related tasks, ranked in order of time spent?
 2. What regular tasks does the staff hate most?
@@ -49,8 +38,6 @@ When interviewing the client, I typically have them walk me through their curren
 I sometimes conclude interviews by asking how the process would look if they could just use magic to make it better. What if it were unconstrained by reality?
 
 ---
-
-
 
 ### Simulation
 
@@ -87,8 +74,6 @@ Based on the observations from the simulation, I expect to need to collect the f
 - Some representation of the current process for tracking and updating the data (format depending on the situation).
 - Who I can text when I have questions.
 
-
-
 ### Defining Success
 
 **Quantitative:**
@@ -103,15 +88,11 @@ Based on the observations from the simulation, I expect to need to collect the f
 - Does the client feel more comfortable increasing the number of subcontractors they work with without increasing headcount?
 - Is the client eager to automate more of the process?
 
-
-
 ### Risks
 
 - The success of an automation process is closely tied to the degree to which the client can and must trust the software's output. I would want to get a sense of where mistakes are tolerable and where they are not, and try to fully automate the former, while focusing on narrowing the human scope of the latter. 
 - Data security. This just has to be managed according to best practices.
 - Poorly-designed automation may create more (or just more tedious) work for the client, rather than less. I would want to clearly document the human portion of any new process and measure that against the current process.
-
-
 
 # Section 2 - Prioritization Exercise
 
@@ -122,7 +103,7 @@ The goal will be to optimize for two objectives:
 1. maximize the visibility of the impact on the client
 2. bring foundational steps forward, and delay features that may rely on those steps.
 
-
+### In order of priority:
 
 ### 1. Automatic detection of missing information from uploaded files
 
@@ -161,15 +142,11 @@ I chose to combine these sections because they significantly overlap. I've respo
 5. The backend sends the documents to an AI endpoint to be reviewed to see if requirements are met.
 6. The documents and the associated AI report appear in the client's dashboard.
 
-
-
 ### 2. What notifications should be sent?
 
 - An initial invitation to upload the documents. 
 - An email when the client marks the subcontractor's documents as incomplete.
 - Any time that a document has been requested, but not submitted, for a period of one week, then every three days thereafter (I just made this pattern up. Would be configurable by the client.)
-
-
 
 ### 3. What should happen when required documents are missing?
 
@@ -178,8 +155,6 @@ I chose to combine these sections because they significantly overlap. I've respo
 - Third, the system should offer configurable notifications that automatically pester the subcontractor until the documents are submitted.
 - Fourth, the dashboard should make it clear which subcontractors have not yet submitted the required documents, and the number of days since the last reminder. Subcontractors more than 14 days (configurable) overdue should be highlighted in red.
 
-
-
 ### 4. Where would you use AI?
 
 The biggest opportunity to benefit from AI is in assessing the subcontractor's documents and providing the compliance officer with information that lets them assess those documents more quickly. In the demo web app, I used Gemini (good balance of cost and accuracy) to look for the presence of information required for compliance. The same infrastructure could be used to:
@@ -187,8 +162,6 @@ The biggest opportunity to benefit from AI is in assessing the subcontractor's d
 1. Extract information from the documents to populate structured data about the subcontractor.
 2. To assess various data points beyond just presence. For example, it could indicate whether a certificate is expired or not, or whether there are inconsistencies in the information provided.
 3. By combining the first two features, the system could also check for consistency across the provided documents, and flag any issues to the compliance officer.
-
-
 
 ### 5. Where would you avoid using AI?
 
@@ -202,8 +175,6 @@ With the caveat that prioritization would be largely dependent on the client's f
 2. Authentication with Role-Based Access Control (RBAC)
 3. Deeper notification content and timing customization
 4. More ways to specify what the document analysis AI should look for and how best to present the results.
-
-
 
 ### 7. What would come after the MVP?
 
@@ -221,7 +192,7 @@ Mock compliance documents can be found in the [mock-docs](https://github.com/jch
 2. Just to be clear, I hand-coded very little of it. What you see is a result of thorough planning with Claude's help. And then sequential prompt execution via Overlord (using Claude, Codex, and Cursor).
 3. I of course specified all of the the interface features, but some of the fit and finish (like the sidebar, colors, corner radius, etc.) is a design library called Shadcn.
 
-[![Demo video walkthrough](https://img.youtube.com/vi/6es_FfoIssE/hqdefault.jpg)](https://youtu.be/6es_FfoIssE)
+[Demo video walkthrough](https://youtu.be/6es_FfoIssE)
 
 # Stack
 
