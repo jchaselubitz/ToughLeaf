@@ -192,7 +192,7 @@ Mock compliance documents can be found in the [mock-docs](https://github.com/jch
 2. Just to be clear, I hand-coded very little of it. What you see is a result of thorough planning with Claude's help. And then sequential prompt execution via Overlord (using Claude, Codex, and Cursor).
 3. I of course specified all of the the interface features, but some of the fit and finish (like the sidebar, colors, corner radius, etc.) is a design library called Shadcn.
 
-[Demo video walkthrough](https://youtu.be/6es_FfoIssE)
+[![Demo video walkthrough](https://img.youtube.com/vi/6es_FfoIssE/hqdefault.jpg)](https://youtu.be/6es_FfoIssE)
 
 # Stack
 
