@@ -18,6 +18,7 @@
     "db:generate": "yarn workspace @tl/api db:generate",
     "db:migrate": "yarn workspace @tl/api db:migrate",
     "db:seed": "yarn workspace @tl/api db:seed",
+    "db:release": "yarn db:migrate && yarn db:seed",
     "db:studio": "yarn workspace @tl/api db:studio",
     "db:setup": "yarn db:migrate && yarn db:seed"
   },

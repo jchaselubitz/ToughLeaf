@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { config } from 'dotenv';
 
@@ -8,8 +9,14 @@ import { config } from 'dotenv';
  * dotenv silently no-ops when the path does not exist, so this is safe there.
  */
 const currentDir = path.dirname(fileURLToPath(import.meta.url));
-// src/db/env.ts (run via tsx) sits three levels below the repo root.
-config({ path: path.resolve(currentDir, '../../../../.env') });
+// Source tooling runs from src/db (four parents from root); the production
+// bundle runs from dist (three parents). This keeps `yarn start` usable with
+// the same local .env while Railway continues to provide real environment vars.
+const envPath = [
+  path.resolve(currentDir, '../../../../.env'),
+  path.resolve(currentDir, '../../../.env'),
+].find(existsSync);
+if (envPath) config({ path: envPath });
 
 /** Resolve DATABASE_URL, throwing a clear error when it is missing. */
 export function getDatabaseUrl(): string {

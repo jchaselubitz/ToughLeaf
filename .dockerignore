@@ -1,0 +1,11 @@
+.git
+.overlord
+.claude
+.env
+.env.*
+!.env.example
+**/node_modules
+**/dist
+mock-docs
+npm-debug.log*
+yarn-error.log*

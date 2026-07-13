@@ -100,6 +100,8 @@ export const documentVersions = pgTable('document_versions', {
   /** Full AI result tied to THIS version (see planning/ai-review.md). */
   aiReview: jsonb('ai_review').$type<ReviewResult>(),
   aiReviewedAt: timestamp('ai_reviewed_at', { withTimezone: true }),
+  /** Error from the most recent advisory AI attempt; does not block human review. */
+  aiReviewError: text('ai_review_error'),
   /** AI-extracted metadata, e.g. `{ "expiry_date": "2026-09-01" }` for COIs. */
   extracted: jsonb('extracted').$type<ReviewExtracted>(),
   /** Parallel per-requirement human decisions (mirrors ai_review's shape). */
@@ -142,6 +144,8 @@ export const emailLog = pgTable('email_log', {
   subject: text('subject').notNull(),
   /** Null when running without a Resend key (preview mode). */
   resendId: text('resend_id'),
+  /** Rendered body retained for preview-mode sends and the internal audit trail. */
+  previewHtml: text('preview_html').notNull(),
   sentAt: timestamp('sent_at', { withTimezone: true }).notNull().defaultNow(),
 });
 

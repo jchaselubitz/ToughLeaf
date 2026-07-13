@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { decidedStatusSchema } from './statuses';
+import { reviewResultSchema } from './review';
 
 /**
  * API input schemas (Zod v4). Shared across the API (validation) and the web app
@@ -29,3 +31,23 @@ export const updateNoteSchema = z.object({
   note: z.string(),
 });
 export type UpdateNoteInput = z.infer<typeof updateNoteSchema>;
+
+/** A human decision attached to the current immutable document version. */
+export const documentReviewDecisionSchema = z
+  .object({
+    status: decidedStatusSchema,
+    humanReview: reviewResultSchema,
+  })
+  .superRefine(({ status, humanReview }, context) => {
+    if (status !== 'incomplete') return;
+    const hasReason = [humanReview.reason, ...humanReview.results.map((result) => result.reason)]
+      .some((reason) => !!reason?.trim());
+    if (!hasReason) {
+      context.addIssue({
+        code: 'custom',
+        path: ['humanReview', 'reason'],
+        message: 'An incomplete document requires a reason.',
+      });
+    }
+  });
+export type DocumentReviewDecisionInput = z.infer<typeof documentReviewDecisionSchema>;

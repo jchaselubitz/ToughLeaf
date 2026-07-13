@@ -31,5 +31,7 @@ export const reviewResultSchema = z.object({
   results: z.array(reviewRequirementResultSchema),
   extracted: reviewExtractedSchema.optional(),
   summary: z.string().optional(),
+  /** Human-entered explanation shown to the subcontractor for an incomplete document. */
+  reason: z.string().optional(),
 });
 export type ReviewResult = z.infer<typeof reviewResultSchema>;

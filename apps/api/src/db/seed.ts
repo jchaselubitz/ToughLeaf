@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto';
 import { and, eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
@@ -72,9 +73,32 @@ async function main() {
       }
     }
 
+    const demoEmail = 'demo-subcontractor@toughleaf.example';
+    let demo = await db.query.subcontractors.findFirst({
+      where: eq(schema.subcontractors.email, demoEmail),
+    });
+    if (!demo) {
+      [demo] = await db.insert(schema.subcontractors).values({
+        name: 'Greenline Electrical LLC',
+        email: demoEmail,
+        certificationType: 'DBE',
+        note: 'Seeded demo account for the production walkthrough.',
+        portalToken: randomBytes(32).toString('base64url'),
+      }).returning();
+    }
+
+    const dueDate = new Date(Date.now() + 14 * 86_400_000).toISOString().slice(0, 10);
+    await db.insert(schema.documentRequests).values(
+      DOCUMENT_TYPE_META.map((meta) => ({
+        subcontractorId: demo.id,
+        documentTypeId: meta.slug,
+        dueDate,
+      })),
+    ).onConflictDoNothing();
+
     console.log(
       `[db] seed complete: ${DOCUMENT_TYPE_META.length} document types, ` +
-        `${insertedRequirements} new requirement(s) inserted`,
+        `${insertedRequirements} new requirement(s) inserted, demo subcontractor ready`,
     );
   } finally {
     await client.end();
