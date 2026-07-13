@@ -68,7 +68,7 @@ export function SettingsDialog({ open, onOpenChange }: { open: boolean; onOpenCh
   const currentPage = pages.find((item) => item.id === page)!;
 
   return <Dialog open={open} onOpenChange={onOpenChange}>
-    <DialogContent className="max-h-[min(680px,calc(100dvh-2rem))] gap-0 overflow-hidden p-0 sm:max-w-3xl" showCloseButton>
+    <DialogContent className="max-h-[min(860px,calc(100dvh-2rem))] gap-0 overflow-hidden p-0 sm:max-w-5xl" showCloseButton>
       <DialogTitle className="sr-only">Settings</DialogTitle>
       <DialogDescription className="sr-only">Manage notifications and document requirements.</DialogDescription>
       <div className="flex min-h-0 flex-col md:flex-row">
@@ -80,7 +80,7 @@ export function SettingsDialog({ open, onOpenChange }: { open: boolean; onOpenCh
             </button>)}
           </div>
         </nav>
-        <main className="flex h-[min(600px,calc(100dvh-7rem))] min-w-0 flex-1 flex-col">
+        <main className="flex h-[min(760px,calc(100dvh-7rem))] min-w-0 flex-1 flex-col">
           <header className="border-b px-5 py-4"><p className="text-sm text-muted-foreground">Settings</p><h2 className="text-lg font-semibold">{currentPage.label}</h2></header>
           <div className="flex-1 overflow-y-auto px-5 py-5">
             {page === 'notifications' ? <p className="text-sm text-muted-foreground">Notification settings are coming soon.</p> : <DocumentRequirements />}

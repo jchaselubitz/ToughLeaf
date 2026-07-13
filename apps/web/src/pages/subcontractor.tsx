@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useParams } from 'react-router-dom';
-import { type FormEvent, useEffect, useState } from 'react';
+import { type FormEvent, type ReactNode, useEffect, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 import type { ReviewResult } from '@tl/shared';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { StatusChip } from '@/components/status';
 import { EmailPreview } from '@/components/email-preview';
 import { useToast } from '@/components/toast';
@@ -51,7 +52,7 @@ function AiReview({ request, version, onRerun, isRerunning }: {
   isRerunning: boolean;
 }) {
   const expiry = request.documentType.id === 'insurance_certificate' && request.status === 'accepted' ? certificateExpiry(version) : undefined;
-  return <div className="space-y-3 rounded-md border border-blue-200 bg-blue-50/50 p-3">
+  return <div className="space-y-2 rounded-md border-l-2 border-blue-300 bg-blue-50/60 py-2 pl-3 pr-2">
     <div className="flex flex-wrap items-center justify-between gap-2">
       <div><p className="text-sm font-medium text-blue-950">AI-generated review</p><p className="text-xs text-blue-800">Advisory only — confirm or correct every result before deciding.</p></div>
       <Button size="sm" variant="outline" disabled={isRerunning} onClick={onRerun}>{isRerunning ? 'Queueing…' : 'Re-run AI review'}</Button>
@@ -93,13 +94,13 @@ function DocumentReview({
     || review.results.some((result) => !result.pass && result.reason?.trim());
   const aiResults = new Map(version.aiReview?.results.map((result) => [result.requirement_id, result]));
 
-  return <div className="space-y-4 border-t pt-4">
+  return <div className="space-y-4">
     <div>
       <p className="text-sm font-medium">Confirm AI results</p>
       <p className="text-xs text-muted-foreground">Review the AI suggestion, then confirm or correct every result before making the decision.</p>
     </div>
-    <div className="space-y-3">
-      {review.results.map((result, index) => <div className="rounded-md border p-3" key={result.requirement_id}>
+    <div className="divide-y">
+      {review.results.map((result, index) => <div className="space-y-2 py-3 first:pt-0 last:pb-0" key={result.requirement_id}>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="min-w-0 flex-1">
             <p className="text-sm font-medium">{result.requirement}</p>
@@ -151,6 +152,24 @@ function DocumentReview({
     {!canMarkIncomplete && <p className="text-xs text-muted-foreground">Add a portal message or a failed-requirement reason to mark this document incomplete.</p>}
     {error && <p className="text-sm text-destructive">{error}</p>}
   </div>;
+}
+
+function Disclosure({ title, meta, defaultOpen = false, children }: {
+  title: string;
+  meta?: ReactNode;
+  defaultOpen?: boolean;
+  children: ReactNode;
+}) {
+  return <details className="group rounded-lg border bg-card" open={defaultOpen}>
+    <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 [&::-webkit-details-marker]:hidden">
+      <span className="text-sm font-medium">{title}</span>
+      <span className="flex items-center gap-3 text-xs text-muted-foreground">
+        {meta}
+        <ChevronDown className="size-4 shrink-0 transition-transform group-open:rotate-180" />
+      </span>
+    </summary>
+    <div className="border-t px-4 py-4">{children}</div>
+  </details>;
 }
 
 export function SubcontractorPage() {
@@ -214,6 +233,7 @@ export function SubcontractorPage() {
   }
 
   const dueDate = sub.documentRequests[0]?.dueDate ?? '';
+  const acceptedCount = sub.documentRequests.filter((request) => request.status === 'accepted').length;
   return (
     <div className="flex flex-col gap-4 md:gap-6">
       <Link className="text-sm text-muted-foreground hover:underline" to="/">
@@ -234,47 +254,27 @@ export function SubcontractorPage() {
       />
     {followUp.isError && <p className="text-sm text-destructive">{followUp.error instanceof Error ? followUp.error.message : 'Unable to send the follow-up.'}</p>}
     {preview && <EmailPreview email={preview} />}
-    <Card>
-      <CardHeader><CardTitle>Subcontractor details</CardTitle></CardHeader>
-      <CardContent>
-        <form className="grid gap-3 sm:grid-cols-4" onSubmit={submit}>
-          <input required name="name" defaultValue={sub.name} className="rounded-md border px-3 py-2" />
-          <input required name="email" type="email" defaultValue={sub.email} className="rounded-md border px-3 py-2" />
-          <input required name="dueDate" type="date" defaultValue={dueDate} className="rounded-md border px-3 py-2" />
-          <Button disabled={save.isPending}>Save changes</Button>
-        </form>
-        <p className="mt-3 text-xs text-muted-foreground">Changing the due date updates all non-accepted document requests.</p>
-      </CardContent>
-    </Card>
-    <Card>
-      <CardHeader><CardTitle>Internal note</CardTitle></CardHeader>
-      <CardContent className="space-y-3">
-        <textarea value={note} onChange={(event) => setNote(event.target.value)} className="min-h-28 w-full rounded-md border p-3" placeholder="Private note — not visible in the portal." />
-        <Button onClick={() => saveNote.mutate()} disabled={saveNote.isPending}>Save note</Button>
-      </CardContent>
-    </Card>
-    <Card>
-      <CardHeader><CardTitle>Email history</CardTitle></CardHeader>
-      <CardContent className="space-y-3">
-        {sub.emailLog.length === 0 ? <p className="text-sm text-muted-foreground">No document request emails have been sent.</p> : <ul className="space-y-3">{sub.emailLog.map((email) => <li className="flex flex-wrap items-center justify-between gap-3 rounded-md border p-3 text-sm" key={email.id}><div><p className="font-medium">{email.kind === 'request' ? 'Initial request' : 'Follow-up'} · {email.subject}</p><p className="text-muted-foreground">To {email.toEmail} · {new Date(email.sentAt).toLocaleString()} · {email.resendId ? 'Delivered through Resend' : 'Preview only'}</p></div>{!email.resendId && <Button size="sm" variant="outline" onClick={() => setPreview(email)}>View preview</Button>}</li>)}</ul>}
-      </CardContent>
-    </Card>
-    <section className="grid gap-3">
+
+    <section className="flex flex-col gap-3">
+      <div className="flex items-baseline justify-between gap-3">
+        <h2 className="text-lg font-semibold tracking-tight">Documents</h2>
+        <span className="text-sm text-muted-foreground">{acceptedCount} of {sub.documentRequests.length} accepted</span>
+      </div>
       {sub.documentRequests.sort((a, b) => a.documentType.sortOrder - b.documentType.sortOrder).map((request) => {
         const currentVersion = request.versions[0];
-        return <Card key={request.id}>
-          <CardContent className="space-y-4 py-5">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="font-medium">{request.documentType.name}</p>
-                <p className="text-sm text-muted-foreground">Due {request.dueDate ?? 'not set'}</p>
-              </div>
-              <StatusChip request={request} />
+        return <Card key={request.id} className="gap-0 overflow-hidden py-0">
+          <div className="flex items-center justify-between gap-4 px-5 py-4">
+            <div>
+              <p className="text-base font-semibold">{request.documentType.name}</p>
+              <p className="text-sm text-muted-foreground">Due {request.dueDate ?? 'not set'}</p>
             </div>
-            <div className="border-t pt-3">
-              <p className="mb-2 text-sm font-medium">Versions</p>
-              {request.versions.length === 0 ? <p className="text-sm text-muted-foreground">No document uploaded yet.</p> : <ul className="space-y-2">
-                {request.versions.map((version, index) => <li className="flex items-center justify-between gap-3 text-sm" key={version.id}>
+            <StatusChip request={request} />
+          </div>
+          <div className="space-y-5 border-t px-5 py-5">
+            <div>
+              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Versions</p>
+              {request.versions.length === 0 ? <p className="text-sm text-muted-foreground">No document uploaded yet.</p> : <ul className="divide-y">
+                {request.versions.map((version, index) => <li className="flex items-center justify-between gap-3 py-2 text-sm first:pt-0 last:pb-0" key={version.id}>
                   <span><span className="font-medium">Version {request.versions.length - index}</span> · {version.filename} <span className="text-muted-foreground">({Math.ceil(version.sizeBytes / 1024)} KB)</span></span>
                   <Button size="sm" variant="outline" disabled={download.isPending} onClick={() => download.mutate({ requestId: request.id, versionId: version.id })}>{download.isPending ? 'Preparing…' : 'Download'}</Button>
                 </li>)}
@@ -294,10 +294,31 @@ export function SubcontractorPage() {
               error={review.isError ? (review.error instanceof Error ? review.error.message : 'Unable to save the review.') : undefined}
               onSave={(input) => review.mutate({ requestId: request.id, ...input })}
             />}
-          </CardContent>
+          </div>
         </Card>;
       })}
     </section>
+
+    <div className="flex flex-col gap-3">
+      <Disclosure title="Subcontractor details" meta={<span className="max-w-40 truncate sm:max-w-none">{sub.email}</span>}>
+        <form className="grid gap-3 sm:grid-cols-4" onSubmit={submit}>
+          <input required name="name" defaultValue={sub.name} className="rounded-md border px-3 py-2" />
+          <input required name="email" type="email" defaultValue={sub.email} className="rounded-md border px-3 py-2" />
+          <input required name="dueDate" type="date" defaultValue={dueDate} className="rounded-md border px-3 py-2" />
+          <Button disabled={save.isPending}>Save changes</Button>
+        </form>
+        <p className="mt-3 text-xs text-muted-foreground">Changing the due date updates all non-accepted document requests.</p>
+      </Disclosure>
+      <Disclosure title="Internal note" meta={note.trim() ? 'Note saved' : 'Empty'}>
+        <div className="space-y-3">
+          <textarea value={note} onChange={(event) => setNote(event.target.value)} className="min-h-28 w-full rounded-md border p-3" placeholder="Private note — not visible in the portal." />
+          <Button onClick={() => saveNote.mutate()} disabled={saveNote.isPending}>Save note</Button>
+        </div>
+      </Disclosure>
+      <Disclosure title="Email history" meta={`${sub.emailLog.length} sent`}>
+        {sub.emailLog.length === 0 ? <p className="text-sm text-muted-foreground">No document request emails have been sent.</p> : <ul className="divide-y">{sub.emailLog.map((email) => <li className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm first:pt-0 last:pb-0" key={email.id}><div><p className="font-medium">{email.kind === 'request' ? 'Initial request' : 'Follow-up'} · {email.subject}</p><p className="text-muted-foreground">To {email.toEmail} · {new Date(email.sentAt).toLocaleString()} · {email.resendId ? 'Delivered through Resend' : 'Preview only'}</p></div>{!email.resendId && <Button size="sm" variant="outline" onClick={() => setPreview(email)}>View preview</Button>}</li>)}</ul>}
+      </Disclosure>
+    </div>
     </div>
   );
 }

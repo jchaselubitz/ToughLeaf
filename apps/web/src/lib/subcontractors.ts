@@ -77,7 +77,13 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 export const subcontractorApi = {
   list: () => request<{ subcontractors: SubcontractorView[] }>('/api/subcontractors'),
   get: (id: string) => request<{ subcontractor: SubcontractorView }>(`/api/subcontractors/${id}`),
-  create: (input: { name: string; email: string; dueDate: string; sendInitialEmail: boolean }) =>
+  create: (input: {
+    name: string;
+    email: string;
+    dueDate: string;
+    documentTypeSlugs: string[];
+    sendInitialEmail: boolean;
+  }) =>
     request<{ subcontractor: SubcontractorView; email?: SentEmailView; emailError?: string }>('/api/subcontractors', {
       method: 'POST', body: JSON.stringify(input),
     }),
@@ -90,6 +96,10 @@ export const subcontractorApi = {
   sendFollowUp: (id: string) =>
     request<{ email: SentEmailView }>(`/api/subcontractors/${id}/email/follow-up`, { method: 'POST' }),
   portal: (token: string) => request<{ subcontractor: SubcontractorView }>(`/api/portal/${token}`),
+  updatePortalEmail: (token: string, email: string) =>
+    request<{ subcontractor: SubcontractorView }>(`/api/portal/${token}/email`, {
+      method: 'PATCH', body: JSON.stringify({ email }),
+    }),
   upload: async (token: string, requestId: string, file: File) => {
     const body = new FormData();
     body.set('file', file);

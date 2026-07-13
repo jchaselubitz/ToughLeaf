@@ -9,6 +9,7 @@ import {
   documentReviewDecisionSchema,
   type ReviewResult,
   updateNoteSchema,
+  updatePortalEmailSchema,
   updateSubcontractorSchema,
 } from '@tl/shared';
 import { db, documentRequests, documentVersions, requirements, settings, subcontractors } from './db';
@@ -153,14 +154,17 @@ app.post('/api/subcontractors', async (c) => {
   const parsed = createSubcontractorSchema.safeParse(body);
   if (!parsed.success) return validationError(c, parsed.error.flatten());
 
-  const { name, email, dueDate, certificationType } = parsed.data;
+  const { name, email, dueDate, documentTypeSlugs, certificationType } = parsed.data;
   const sendInitialEmail = (body as { sendInitialEmail?: unknown } | null)?.sendInitialEmail === true;
   const subcontractor = await db.transaction(async (tx) => {
     const [created] = await tx
       .insert(subcontractors)
       .values({ name, email, certificationType, portalToken: randomBytes(32).toString('base64url') })
       .returning();
-    const types = await tx.query.documentTypes.findMany({ orderBy: (type, { asc: orderAsc }) => [orderAsc(type.sortOrder)] });
+    const allTypes = await tx.query.documentTypes.findMany({ orderBy: (type, { asc: orderAsc }) => [orderAsc(type.sortOrder)] });
+    const types = documentTypeSlugs
+      ? allTypes.filter((type) => documentTypeSlugs.includes(type.id as (typeof documentTypeSlugs)[number]))
+      : allTypes;
     await tx.insert(documentRequests).values(
       types.map((type) => ({ subcontractorId: created.id, documentTypeId: type.id, dueDate })),
     );
@@ -310,6 +314,23 @@ app.get('/api/portal/:token', async (c) => {
   });
   if (!subcontractor) return c.json({ error: 'Portal not found' }, 404);
   return c.json({ subcontractor: serializePortalSubcontractor(subcontractor) });
+});
+
+app.patch('/api/portal/:token/email', async (c) => {
+  const parsed = updatePortalEmailSchema.safeParse(await c.req.json().catch(() => null));
+  if (!parsed.success) return validationError(c, parsed.error.flatten());
+  const [subcontractor] = await db
+    .update(subcontractors)
+    .set({ email: parsed.data.email })
+    .where(eq(subcontractors.portalToken, c.req.param('token')))
+    .returning();
+  if (!subcontractor) return c.json({ error: 'Portal not found' }, 404);
+  const withRequests = await db.query.subcontractors.findFirst({
+    where: eq(subcontractors.id, subcontractor.id),
+    with: requestWithType,
+  });
+  if (!withRequests) return c.json({ error: 'Portal not found' }, 404);
+  return c.json({ subcontractor: serializePortalSubcontractor(withRequests) });
 });
 
 app.post(

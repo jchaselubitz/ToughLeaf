@@ -1,18 +1,21 @@
 import { z } from 'zod';
 import { decidedStatusSchema } from './statuses';
 import { reviewResultSchema } from './review';
+import { documentTypeSlugSchema } from './document-types';
 
 /**
  * API input schemas (Zod v4). Shared across the API (validation) and the web app
  * (form typing). Table-derived schemas via `drizzle-zod` live with the DB layer.
  */
 
-/** Add-subcontractor modal: name, email, and a single due date applied to all 5 requests. */
+/** Add-subcontractor modal: name, email, the selected document types, and a single due date applied to each. */
 export const createSubcontractorSchema = z.object({
   name: z.string().trim().min(1, 'Name is required'),
   email: z.email('A valid email is required'),
   /** ISO date (YYYY-MM-DD); written onto each created document_request. */
   dueDate: z.iso.date(),
+  /** Which document types to request; defaults to all when omitted. */
+  documentTypeSlugs: z.array(documentTypeSlugSchema).min(1, 'Select at least one document').optional(),
   certificationType: z.string().trim().min(1).optional(),
 });
 export type CreateSubcontractorInput = z.infer<typeof createSubcontractorSchema>;
@@ -25,6 +28,12 @@ export const updateSubcontractorSchema = z.object({
   certificationType: z.string().trim().min(1).nullable().optional(),
 });
 export type UpdateSubcontractorInput = z.infer<typeof updateSubcontractorSchema>;
+
+/** Portal self-service: the subcontractor updating the email on file for their own record. */
+export const updatePortalEmailSchema = z.object({
+  email: z.email('A valid email is required'),
+});
+export type UpdatePortalEmailInput = z.infer<typeof updatePortalEmailSchema>;
 
 /** Internal, never-shown-to-the-sub note. */
 export const updateNoteSchema = z.object({
