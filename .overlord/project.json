@@ -1,0 +1,12 @@
+{
+  "_warning": "This file is managed by Overlord and is regenerated automatically when this folder is linked as a project resource. Do not edit it manually — manual changes will be overwritten.",
+  "version": 2,
+  "projectId": "fc5464ab-d26e-410d-89a2-a312ddb769bf",
+  "resourceId": "040d8aef-5d9d-4ae6-8ce6-158f6268d391",
+  "resourceKey": "tough-leaf",
+  "resourceIdsByExecutionTarget": {
+    "cf857924-0eb4-447d-b999-307c1411f094": "040d8aef-5d9d-4ae6-8ce6-158f6268d391"
+  },
+  "isPrimary": true,
+  "linkedAt": "2026-07-13T06:24:54.873Z"
+}
