@@ -19,8 +19,6 @@ I sometimes conclude interviews by asking how the process would look if they cou
 
 ---
 
-
-
 ### Simulation
 
 For the purposes of this exercise, I used ChatGPT to first research the relevant regulations, then to simulate a compliance officer.
@@ -57,7 +55,6 @@ Based on the observations from the simulation, I expect to need to collect the f
 - Who I can text when I have questions.
 
 
-
 ### Defining Success
 
 **Quantitative:**
@@ -73,13 +70,11 @@ Based on the observations from the simulation, I expect to need to collect the f
 - Is the client eager to automate more of the process?
 
 
-
 ### Risks
 
 - The success of an automation process is closely tied to the degree to which the client can and must trust the software's output. I would want to get a sense of where mistakes are tolerable and where they are not, and try to fully automate the former, while focusing on narrowing the human scope of the latter. 
 - Data security. This just has to be managed according to best practices.
 - Poorly-designed automation may create more (or just more tedious) work for the client, rather than less. I would want to clearly document the human portion of any new process and measure that against the current process.
-
 
 
 # Section 2 - Prioritization Exercise
@@ -90,7 +85,6 @@ The goal will be to optimize for two objectives:
 
 1. maximize the visibility of the impact on the client
 2. bring foundational steps forward, and delay features that may rely on those steps.
-
 
 
 #### 1. Automatic detection of missing information from uploaded files
@@ -131,14 +125,11 @@ I chose to combine these sections because they significantly overlap. I've respo
 6. The documents and the associated AI report appear in the client's dashboard.
 
 
-
 ### 2. What notifications should be sent?
 
 - An initial invitation to upload the documents. 
 - An email when the client marks the subcontractor's documents as incomplete.
 - Any time that a document has been requested, but not submitted, for a period of one week, then every three days thereafter (I just made this pattern up. Would be configurable by the client.)
-
-
 
 ### 3. What should happen when required documents are missing?
 
@@ -147,8 +138,6 @@ I chose to combine these sections because they significantly overlap. I've respo
 - Third, the system should offer configurable notifications that automatically pester the subcontractor until the documents are submitted.
 - Fourth, the dashboard should make it clear which subcontractors have not yet submitted the required documents, and the number of days since the last reminder. Subcontractors more than 14 days (configurable) overdue should be highlighted in red.
 
-
-
 ### 4. Where would you use AI?
 
 The biggest opportunity to benefit from AI is in assessing the subcontractor's documents and providing the compliance officer with information that lets them assess those documents more quickly. In the demo web app, I used Gemini (good balance of cost and accuracy) to look for the presence of information required for compliance. The same infrastructure could be used to:
@@ -156,8 +145,6 @@ The biggest opportunity to benefit from AI is in assessing the subcontractor's d
 1. Extract information from the documents to populate structured data about the subcontractor.
 2. To assess various data points beyond just presence. For example, it could indicate whether a certificate is expired or not, or whether there are inconsistencies in the information provided.
 3. By combining the first two features, the system could also check for consistency across the provided documents, and flag any issues to the compliance officer.
-
-
 
 ### 5. Where would you avoid using AI?
 
@@ -172,7 +159,6 @@ With the caveat that prioritization would be largely dependent on the client's f
 3. Deeper notification content and timing customization
 4. More ways to specify what the document analysis AI should look for and how best to present the results.
 
-
 ### 7. What would come after the MVP?
 
 Again, this would depend on identifying the smallest features that provide the most value. If the primary issue is that subcontractors are not providing the required documents, I would focus more on software that both reminds subcontractors, makes submission easier, and offers more tools to compliance professionals who need to pester the subcontractors. If instead the issue is that subcontractors are providing incomplete or insufficient documents, I would look for ways to push the initial document assessment out towards the subcontractor interface, so they could get immediate feedback on what they need to fix.
@@ -181,14 +167,14 @@ Again, this would depend on identifying the smallest features that provide the m
 
 The demo webapp is hosted at [https://tl-challenge-web-dev.railway.app/](https://tl-challenge-web-dev.railway.app/).
 
-Some important notes:
-1. Most of the features are fully functional (including email notifications and document analysis).
+Mock compliance documents can be found in the [docs](https://github.com/jchaselubitz/ToughLeaf/tree/main/docs) folder.
+
+**Some important notes:**
+1. Most of the features are fully functional (including email notifications and AI document analysis), but this is a demo, so may of course encounter bugs.
 2. Just to be clear, I hand-coded very little of it. What you see is a result of thorough planning with Claude's help. And then sequential prompt execution via Overlord (using Claude, Codex, and Cursor).
 3. I of course specified all of the the interface features, but some of the fit and finish (like the sidebar, colors, corner radius, etc.) is a design library called Shadcn.
 
-
-
-[]
+[![Demo video](https://img.youtube.com/vi/6es_FfoIssE/maxresdefault.jpg)](https://youtu.be/6es_FfoIssE)
 
 # Stack
  
