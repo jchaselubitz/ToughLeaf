@@ -9,7 +9,7 @@ COPY apps/api/package.json apps/api/package.json
 COPY apps/web/package.json apps/web/package.json
 COPY packages/shared/package.json packages/shared/package.json
 
-RUN yarn install --frozen-lockfile --non-interactive
+RUN yarn install --immutable
 
 COPY . .
 RUN yarn build
