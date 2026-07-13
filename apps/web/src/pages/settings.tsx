@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Minus, Plus } from 'lucide-react';
+import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/components/toast';
@@ -54,11 +55,22 @@ function DocumentTypeSettings({ documentType }: { documentType: SettingsDocument
 
 export function SettingsPage() {
   const settings = useQuery({ queryKey: ['settings'], queryFn: settingsApi.list });
-  if (settings.isLoading) return <main className="p-12 text-muted-foreground">Loading settings…</main>;
-  if (settings.isError || !settings.data) return <main className="p-12">Unable to load settings.</main>;
-  return <main className="mx-auto min-h-screen max-w-4xl space-y-6 px-6 py-12">
-    <Link className="text-sm text-muted-foreground hover:underline" to="/">← Dashboard</Link>
-    <header><p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">Tough Leaf</p><h1 className="mt-2 text-3xl font-semibold">Review settings</h1><p className="mt-2 text-muted-foreground">Requirements and instructions are included in future AI document reviews.</p></header>
-    <section className="space-y-4">{settings.data.documentTypes.map((documentType) => <DocumentTypeSettings key={documentType.id} documentType={documentType} />)}</section>
-  </main>;
+  if (settings.isLoading) return <p className="text-muted-foreground">Loading settings…</p>;
+  if (settings.isError || !settings.data) return <p>Unable to load settings.</p>;
+  return (
+    <div className="flex flex-col gap-4 md:gap-6">
+      <Link className="text-sm text-muted-foreground hover:underline" to="/">
+        ← Dashboard
+      </Link>
+      <PageHeader
+        title="Review settings"
+        description="Requirements and instructions are included in future AI document reviews."
+      />
+      <section className="space-y-4">
+        {settings.data.documentTypes.map((documentType) => (
+          <DocumentTypeSettings key={documentType.id} documentType={documentType} />
+        ))}
+      </section>
+    </div>
+  );
 }

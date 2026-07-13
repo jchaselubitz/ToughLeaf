@@ -1,23 +1,36 @@
 import { randomBytes } from 'node:crypto';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { DOCUMENT_TYPE_META } from '@tl/shared';
 import { getDatabaseUrl } from './env';
 import * as schema from './schema';
-import { SEED_REQUIREMENTS } from './seed-data';
+import { DEMO_SUBCONTRACTORS, SEED_REQUIREMENTS } from './seed-data';
 
 /**
- * Idempotent seed: loads the 5 document types, their default seeded
- * requirements, and one empty settings row per type. Run with `yarn db:seed`
- * (after `yarn db:migrate`). Safe to re-run — doc types/settings upsert and
- * seeded requirements are only inserted when missing.
+ * Reset-and-seed script for the demo. It clears all application data, then
+ * loads the 5 document types, their default requirements/settings, and four
+ * believable subcontractors. Run with `yarn db:seed` (after `yarn db:migrate`).
  */
 async function main() {
   const client = postgres(getDatabaseUrl(), { max: 1 });
   const db = drizzle(client, { schema });
 
   try {
+    // All application tables are reset together so re-seeding produces a
+    // known demo state with no stale documents, emails, or subcontractors.
+    await db.execute(sql`
+      TRUNCATE TABLE
+        email_log,
+        document_versions,
+        document_requests,
+        requirements,
+        settings,
+        subcontractors,
+        document_types
+      RESTART IDENTITY CASCADE
+    `);
+
     let insertedRequirements = 0;
 
     for (const meta of DOCUMENT_TYPE_META) {
@@ -73,32 +86,33 @@ async function main() {
       }
     }
 
-    const demoEmail = 'demo-subcontractor@toughleaf.example';
-    let demo = await db.query.subcontractors.findFirst({
-      where: eq(schema.subcontractors.email, demoEmail),
-    });
-    if (!demo) {
-      [demo] = await db.insert(schema.subcontractors).values({
-        name: 'Greenline Electrical LLC',
-        email: demoEmail,
-        certificationType: 'DBE',
-        note: 'Seeded demo account for the production walkthrough.',
-        portalToken: randomBytes(32).toString('base64url'),
-      }).returning();
-    }
+    for (const demo of DEMO_SUBCONTRACTORS) {
+      const [subcontractor] = await db
+        .insert(schema.subcontractors)
+        .values({
+          name: demo.name,
+          email: demo.email,
+          certificationType: demo.certificationType,
+          note: demo.note,
+          portalToken: randomBytes(32).toString('base64url'),
+        })
+        .returning();
 
-    const dueDate = new Date(Date.now() + 14 * 86_400_000).toISOString().slice(0, 10);
-    await db.insert(schema.documentRequests).values(
-      DOCUMENT_TYPE_META.map((meta) => ({
-        subcontractorId: demo.id,
-        documentTypeId: meta.slug,
-        dueDate,
-      })),
-    ).onConflictDoNothing();
+      const dueDate = new Date(Date.now() + demo.dueInDays * 86_400_000)
+        .toISOString()
+        .slice(0, 10);
+      await db.insert(schema.documentRequests).values(
+        DOCUMENT_TYPE_META.map((meta) => ({
+          subcontractorId: subcontractor.id,
+          documentTypeId: meta.slug,
+          dueDate,
+        })),
+      );
+    }
 
     console.log(
       `[db] seed complete: ${DOCUMENT_TYPE_META.length} document types, ` +
-        `${insertedRequirements} new requirement(s) inserted, demo subcontractor ready`,
+        `${insertedRequirements} requirement(s) inserted, ${DEMO_SUBCONTRACTORS.length} demo subcontractors ready`,
     );
   } finally {
     await client.end();

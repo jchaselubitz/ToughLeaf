@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useParams } from 'react-router-dom';
 import { type FormEvent, useEffect, useState } from 'react';
 import type { ReviewResult } from '@tl/shared';
+import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StatusChip } from '@/components/status';
@@ -194,8 +195,8 @@ export function SubcontractorPage() {
     return () => window.clearInterval(interval);
   }, [hasPendingAiReview, queryClient, id]);
 
-  if (detail.isLoading) return <main className="p-12 text-muted-foreground">Loading…</main>;
-  if (!sub) return <main className="p-12">Subcontractor not found.</main>;
+  if (detail.isLoading) return <p className="text-muted-foreground">Loading…</p>;
+  if (!sub) return <p>Subcontractor not found.</p>;
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -204,12 +205,24 @@ export function SubcontractorPage() {
   }
 
   const dueDate = sub.documentRequests[0]?.dueDate ?? '';
-  return <main className="mx-auto min-h-screen max-w-4xl space-y-6 px-6 py-12">
-    <Link className="text-sm text-muted-foreground hover:underline" to="/">← Dashboard</Link>
-    <header className="flex flex-wrap items-start justify-between gap-3">
-      <div><h1 className="text-3xl font-semibold">{sub.name}</h1><a className="text-sm text-blue-700 underline" href={`/portal/${sub.portalToken}`} target="_blank" rel="noreferrer">Open subcontractor portal</a></div>
-      <Button variant="outline" disabled={followUp.isPending} onClick={() => followUp.mutate()}>{followUp.isPending ? 'Sending…' : 'Send follow-up'}</Button>
-    </header>
+  return (
+    <div className="flex flex-col gap-4 md:gap-6">
+      <Link className="text-sm text-muted-foreground hover:underline" to="/">
+        ← Dashboard
+      </Link>
+      <PageHeader
+        title={sub.name}
+        description={
+          <a className="text-blue-700 underline" href={`/portal/${sub.portalToken}`} target="_blank" rel="noreferrer">
+            Open subcontractor portal
+          </a>
+        }
+        actions={
+          <Button variant="outline" disabled={followUp.isPending} onClick={() => followUp.mutate()}>
+            {followUp.isPending ? 'Sending…' : 'Send follow-up'}
+          </Button>
+        }
+      />
     {followUp.isError && <p className="text-sm text-destructive">{followUp.error instanceof Error ? followUp.error.message : 'Unable to send the follow-up.'}</p>}
     {preview && <EmailPreview email={preview} />}
     <Card>
@@ -276,5 +289,6 @@ export function SubcontractorPage() {
         </Card>;
       })}
     </section>
-  </main>;
+    </div>
+  );
 }

@@ -173,10 +173,46 @@ With the caveat that prioritization would be largely dependent on the client's f
 4. More ways to specify what the document analysis AI should look for and how best to present the results.
 
 
-
 ### 7. What would come after the MVP?
 
 Again, this would depend on identifying the smallest features that provide the most value. If the primary issue is that subcontractors are not providing the required documents, I would focus more on software that both reminds subcontractors, makes submission easier, and offers more tools to compliance professionals who need to pester the subcontractors. If instead the issue is that subcontractors are providing incomplete or insufficient documents, I would look for ways to push the initial document assessment out towards the subcontractor interface, so they could get immediate feedback on what they need to fix.
 
-### Demo Video
+### Demo Webapp
 
+The demo webapp is hosted at [https://tl-challenge-web-dev.railway.app/](https://tl-challenge-web-dev.railway.app/).
+
+Some important notes:
+1. Most of the features are fully functional (including email notifications and document analysis).
+2. Just to be clear, I hand-coded very little of it. What you see is a result of thorough planning with Claude's help. And then sequential prompt execution via Overlord (using Claude, Codex, and Cursor).
+3. I of course specified all of the the interface features, but some of the fit and finish (like the sidebar, colors, corner radius, etc.) is a design library called Shadcn.
+
+
+
+[]
+
+# Stack
+ 
+ ### Tools used
+ * Overlord - A tool I created for managing large numbers of prompts and agents as the build software. 
+ * Claude - I worked out features and architecture with Claude Fable 5 before beginning work. The goal was to define a scope that was useful but limited opportunity for edge cases. Opus 4.8 build portions of the system.
+ * Codex - 5.6 Terra build large portions of the system, with 5.6 Sol, doing the final review for the first complete version. 
+ * Cursor - I did some cleanup with Cursor Auto. I also use it as my IDE.
+
+ ### Infrastructure
+ * Railway - Hosting.
+ * Docker - Containerization.
+ * Postgres - Database.
+ * Minio - Object storage.
+ * Resend - Email notifications.
+ * Gemini - AI processing.
+
+### Libraries
+* React - Frontend.
+* Tailwind - CSS.
+* Shadcn - UI components.
+* Drizzle - Database ORM.
+* Zod - Validation.
+* Tanstack Query - Data fetching.
+* Tanstack Table - Table components.
+* Hono - API framework.
+* Vite - Build tool.

@@ -1,5 +1,36 @@
 import type { DocumentTypeSlug } from '@tl/shared';
 
+export const DEMO_SUBCONTRACTORS = [
+  {
+    name: 'Harbor Point Electric LLC',
+    email: 'compliance@harborpointelectric.example',
+    certificationType: 'WBE',
+    note: 'Commercial electrician serving tenant-improvement and multifamily projects.',
+    dueInDays: -7,
+  },
+  {
+    name: 'Summit Ridge Electrical Contractors, Inc.',
+    email: 'documents@summitridgeelectric.example',
+    certificationType: 'MBE',
+    note: 'Electrical contractor focused on lighting controls, low-voltage, and service upgrades.',
+    dueInDays: 3,
+  },
+  {
+    name: 'Keystone Plumbing & Mechanical LLC',
+    email: 'compliance@keystoneplumbing.example',
+    certificationType: 'SBE',
+    note: 'Licensed plumbing subcontractor for commercial build-outs and renovation work.',
+    dueInDays: 14,
+  },
+  {
+    name: 'Alder & Ash Interiors LLC',
+    email: 'studio@alderashinteriors.example',
+    certificationType: 'WBE',
+    note: 'Interior decorator providing finish selection, furnishing, and installation coordination.',
+    dueInDays: 21,
+  },
+] as const;
+
 /**
  * Seeded default requirements per document type (see planning/ai-review.md,
  * "Seeded default requirements"). One requirement = one row; each is sent to

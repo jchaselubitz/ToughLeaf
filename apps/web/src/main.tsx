@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './index.css';
+import { AppLayout } from '@/components/app-layout';
 import { DashboardPage } from '@/pages/dashboard';
 import { PortalPage } from '@/pages/portal';
 import { SubcontractorPage } from '@/pages/subcontractor';
@@ -20,9 +21,11 @@ createRoot(rootEl).render(
       <ToastProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/subcontractors/:id" element={<SubcontractorPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
+            <Route element={<AppLayout />}>
+              <Route path="/" element={<DashboardPage />} />
+              <Route path="/subcontractors/:id" element={<SubcontractorPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+            </Route>
             <Route path="/portal/:token" element={<PortalPage />} />
           </Routes>
         </BrowserRouter>
