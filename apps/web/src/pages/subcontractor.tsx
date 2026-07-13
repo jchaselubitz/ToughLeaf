@@ -58,10 +58,6 @@ function AiReview({ request, version, onRerun, isRerunning }: {
     </div>
     {version.aiReview && <>
       {version.aiReview.summary && <p className="text-sm text-blue-950">{version.aiReview.summary}</p>}
-      <ul className="space-y-2">{version.aiReview.results.map((result) => <li className="rounded border border-blue-100 bg-white p-2 text-sm" key={result.requirement_id}>
-        <span className={result.pass ? 'font-medium text-emerald-700' : 'font-medium text-destructive'}>{result.pass ? 'Pass' : 'Needs correction'}</span><span className="ml-2">{result.requirement}</span>
-        {!result.pass && result.reason && <p className="mt-1 text-muted-foreground">{result.reason}</p>}
-      </li>)}</ul>
     </>}
     {!version.aiReview && !version.aiReviewError && <p className="text-sm text-blue-800">AI review is running… this card refreshes automatically.</p>}
     {version.aiReviewError && <p className="text-sm text-destructive">{version.aiReviewError}</p>}
@@ -95,24 +91,37 @@ function DocumentReview({
 
   const canMarkIncomplete = Boolean(review.reason?.trim())
     || review.results.some((result) => !result.pass && result.reason?.trim());
+  const aiResults = new Map(version.aiReview?.results.map((result) => [result.requirement_id, result]));
 
   return <div className="space-y-4 border-t pt-4">
     <div>
-      <p className="text-sm font-medium">Human review</p>
-      <p className="text-xs text-muted-foreground">Record corrections for each requirement before making the decision.</p>
+      <p className="text-sm font-medium">Confirm AI results</p>
+      <p className="text-xs text-muted-foreground">Review the AI suggestion, then confirm or correct every result before making the decision.</p>
     </div>
     <div className="space-y-3">
       {review.results.map((result, index) => <div className="rounded-md border p-3" key={result.requirement_id}>
-        <label className="block text-sm font-medium" htmlFor={`${version.id}-${result.requirement_id}-status`}>{result.requirement}</label>
-        <select
-          id={`${version.id}-${result.requirement_id}-status`}
-          className="mt-2 rounded-md border px-2 py-1 text-sm"
-          value={result.pass ? 'pass' : 'fail'}
-          onChange={(event) => updateResult(index, { pass: event.target.value === 'pass' })}
-        >
-          <option value="pass">Pass</option>
-          <option value="fail">Needs correction</option>
-        </select>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium">{result.requirement}</p>
+            {aiResults.get(result.requirement_id) && <p className="mt-1 text-xs text-muted-foreground">
+              AI suggestion: <span className={aiResults.get(result.requirement_id)?.pass ? 'font-medium text-emerald-700' : 'font-medium text-destructive'}>
+                {aiResults.get(result.requirement_id)?.pass ? 'Pass' : 'Needs correction'}
+              </span>
+            </p>}
+          </div>
+          <label className="flex shrink-0 items-center gap-2 text-sm" htmlFor={`${version.id}-${result.requirement_id}-status`}>
+            <span className="font-medium">Your decision</span>
+            <select
+              id={`${version.id}-${result.requirement_id}-status`}
+              className="rounded-md border bg-background px-2 py-1 text-sm"
+              value={result.pass ? 'pass' : 'fail'}
+              onChange={(event) => updateResult(index, { pass: event.target.value === 'pass' })}
+            >
+              <option value="pass">Pass</option>
+              <option value="fail">Needs correction</option>
+            </select>
+          </label>
+        </div>
         {!result.pass && <textarea
           className="mt-2 min-h-16 w-full rounded-md border p-2 text-sm"
           placeholder="What is missing or needs correction?"
