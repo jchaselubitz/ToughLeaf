@@ -33,7 +33,7 @@
 
 ### Initial Questions
 
-10 is too many high-level questions, and 10 specific, detailed questions are too few. When approaching a new domain, I start with question areas:
+10 is too many high-level questions, and also too few specific questions. When approaching a new domain, I start with question areas:
 
 1. What are the regular, process-related tasks, ranked in order of time spent?
 2. What regular tasks does the staff hate most?
